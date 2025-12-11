@@ -1,0 +1,40 @@
+import streamlit as st
+import pickle
+import pandas as pd
+
+
+def get_clean_data():
+    data = pd.read_csv("data/data.csv")
+    data = data.drop(columns=["Unnamed: 32"])
+    data['diagnosis'] = data['diagnosis'].map({ 'M ':1, 'B':0 })
+    return data
+
+def add_sidebar():
+    st.sidebar.header("Cell Nuclei Measurements")
+
+
+def main():
+    st.set_page_config(
+        page_title ="Breast Cancer Predictor",
+        page_icon=":female-doctor:",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
+
+    add_sidebar()
+
+    with st.container():
+        st.title("Breast Cancer Predictor")
+        st.write("Please connect this app to your cytology lab to help diagnose breast cancer from your tissue sample. This app predicts using machine learning model whether a breast mass is begnign or malignant based on measurements it receives from your cytosis lab. You can also update the measurements by hand using the sliders in the sidebar.")
+
+    col1, col2 = st.columns([4,1])
+
+    with col1:
+        st.write("this is column 1")
+
+    with col2:
+        st.write("this is column 2")
+
+
+if __name__ == "__main__":
+    main()
