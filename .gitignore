@@ -1,0 +1,48 @@
+# -------------------------
+# IDE and editor files
+# -------------------------
+.idea/
+.vscode/
+*.iml
+
+# -------------------------
+# Python cache and artifacts
+# -------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+build/
+dist/
+
+# -------------------------
+# Virtual environments
+# -------------------------
+venv/
+.env/
+.envrc
+
+# -------------------------
+# Jupyter Notebook
+# -------------------------
+.ipynb_checkpoints/
+
+# -------------------------
+# Streamlit and logs
+# -------------------------
+.streamlit/
+logs/
+
+# -------------------------
+# Data and models (optional)
+# -------------------------
+data/
+models/
+
+# -------------------------
+# OS-specific files
+# -------------------------
+.DS_Store
+Thumbs.db
