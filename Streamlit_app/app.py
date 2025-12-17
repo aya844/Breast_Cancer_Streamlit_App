@@ -2,6 +2,7 @@ import streamlit as st
 import pickle
 import pandas as pd
 import plotly.graph_objects as go
+import numpy as np
 
 def get_clean_data():
     data = pd.read_csv("../data/data.csv")
@@ -127,6 +128,48 @@ def get_radar_chart(input_data):
 
     return fig
 
+def add_predictions(input_data):
+    model = pickle.load(open('../models/model.pkl', 'rb'))
+    scaler = pickle.load(open('../models/scaler.pkl', 'rb'))
+
+    # StandardScaler was likely fit on a dataset including the 'id' column,
+    # resulting in 31 expected features (id + 30 measurements), while the UI
+    # only collects the 30 measurement features. To match the scaler's
+    # expectations, we prepend a neutral placeholder for the missing 'id'.
+    # Using the scaler's learned mean for that first position ensures the
+    # standardized value becomes zero and doesn't affect the prediction.
+    try:
+        features_list = list(input_data.values())  # 30 measurement features in fixed UI order
+
+        # Determine a safe placeholder for the first column the scaler expects (assumed to be 'id').
+        id_placeholder = float(getattr(scaler, 'mean_', [0.0])[0])
+
+        features_with_id = [id_placeholder] + features_list  # now 31 features
+        input_array = np.array(features_with_id, dtype=float).reshape(1, -1)
+
+        input_array_scaled = scaler.transform(input_array)
+        prediction = model.predict(input_array_scaled)
+        #st.write(prediction)
+    except Exception as e:
+        st.error(f"Prediction failed: {e}")
+
+    st.subheader("Cell cluster prediction")
+    st.write("The cell cluster is :")
+
+    if prediction[0] == 0:
+        st.write("Benign")
+    else:
+        st.write("Malignant")
+
+    st.write("Probability of being benign : ", model.predict_proba(input_array_scaled)[0][0])
+    st.write("Probability of being malignant : ", model.predict_proba(input_array_scaled)[0][1])
+
+    st.write("This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")
+    #input_array = np.array(list(input_data.values())).reshape(1, -1)
+    #input_array_scaled = scaler.transform(input_array)
+    #prediction = model.predict(input_array_scaled)
+    #st.write(prediction)
+
 def main():
     st.set_page_config(
         page_title ="Breast Cancer Predictor",
@@ -148,7 +191,7 @@ def main():
         radar_chart = get_radar_chart(input_data)
         st.plotly_chart(radar_chart)
     with col2:
-        st.write("this is column 2")
+        add_predictions(input_data)
 
 
 if __name__ == "__main__":
